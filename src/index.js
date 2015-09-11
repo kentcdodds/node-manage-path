@@ -13,9 +13,8 @@ function addToPath(pathToAdd, options) {
   PATH = getPathVar(platform);
 
   originalPath = env[PATH];
-  pathArray = [];
+  pathArray = getPathArray(pathToAdd);
 
-  pathArray.push(pathToAdd);
 
   if (env[PATH]) {
     pathArray.push(env[PATH]);
@@ -28,7 +27,17 @@ function addToPath(pathToAdd, options) {
   };
 }
 
-function isNonEmptyString(arg) {
+function getPathArray(pathToAdd) {
+  if (Array.isArray(pathToAdd)) {
+    return pathToAdd;
+  } else {
+    return [pathToAdd];
+  }
+}
+function isNonEmptyString(arg, noArrays) {
+  if (!noArrays && Array.isArray(arg)) {
+    return arg.every(a => isNonEmptyString(a, true));
+  }
   return typeof arg === 'string' && arg.length > 0;
 }
 

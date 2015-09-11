@@ -41,6 +41,14 @@ describe('add-to-path', () => {
       addToPath(pathToAdd);
       expect(env[PATH]).to.equal(pathToAdd);
     });
+
+    it('should handle an array of strings', () => {
+      const platform = 'darwin';
+      const separator = ':';
+      const paths = [pathToAdd, '/bar/foo/.bin'];
+      addToPath(paths, {platform});
+      expect(env[PATH]).to.startWith(paths.join(separator));
+    });
   });
 
   describe('on darwin platform', () => {
