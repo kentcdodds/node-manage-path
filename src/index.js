@@ -3,7 +3,6 @@ var env = process.env;
 module.exports = addToPath;
 
 function addToPath(pathToAdd, options) {
-  /* eslint complexity:[2, 6] */
   var platform, PATH, originalPath, pathArray;
   if (!isNonEmptyString(pathToAdd)) {
     throw new Error('path-to-add error: Must pass a non-empty string. You passed: ' + pathToAdd);
@@ -15,10 +14,7 @@ function addToPath(pathToAdd, options) {
   originalPath = env[PATH];
   pathArray = getPathArray(pathToAdd);
 
-
-  if (env[PATH]) {
-    pathArray.push(env[PATH]);
-  }
+  addExistingPath(pathArray, env[PATH], options.append);
 
   env[PATH] = pathArray.join(platform === 'win32' ? ';' : ':');
 
@@ -34,6 +30,18 @@ function getPathArray(pathToAdd) {
     return [pathToAdd];
   }
 }
+
+function addExistingPath(array, path, appendMode) {
+  if (!path) {
+    return;
+  }
+  if (appendMode) {
+    array.unshift(path);
+  } else {
+    array.push(path);
+  }
+}
+
 function isNonEmptyString(arg, noArrays) {
   if (!noArrays && Array.isArray(arg)) {
     return arg.every(a => isNonEmptyString(a, true));

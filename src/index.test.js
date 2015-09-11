@@ -49,6 +49,11 @@ describe('add-to-path', () => {
       addToPath(paths, {platform});
       expect(env[PATH]).to.startWith(paths.join(separator));
     });
+
+    it('should allow you to append to the path', () => {
+      addToPath(pathToAdd, {append: true});
+      expect(env[PATH]).to.endWith(pathToAdd);
+    });
   });
 
   describe('on darwin platform', () => {
