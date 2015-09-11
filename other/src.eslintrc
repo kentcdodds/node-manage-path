@@ -1,0 +1,11 @@
+{
+  "extends": "kentcdodds",
+  "echmaFeatures": null,
+  "rules": {
+    "no-var": 0
+  },
+  "env": {
+    "es6": false,
+    "browser": false
+  }
+}
