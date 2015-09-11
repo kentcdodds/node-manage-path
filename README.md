@@ -8,6 +8,8 @@ Status:
 
 This micro-lib allows you to alter the `$PATH` in a cross-platform way.
 
+## Main Usage
+
 ```javascript
 var path = require('path');
 var addToPath = require('add-to-path');
@@ -18,7 +20,22 @@ var restorePath = addToPath(path.join(process.cwd(), 'node_modules', '.bin'));
 // want to restore the path to what it was before you mucked with it?
 // just call the function you get back:
 restorePath();
+
+// wanna add several paths at once? Done!
+addToPath(['/foo/bar/.bin', '/bar/foo/.bin']);
 ```
+
+
+## options
+
+### platform
+
+Allows you to specify your own platform. Defaults to `process.platform`. Currently the only meaningful value is
+`'win32'`. This option is mainly available for testing purposes.
+
+### append
+
+Defaults to `undefined`, but when set to `true` will add the directory you pass to the end (rather than the beginning).
 
 # Other info
 
