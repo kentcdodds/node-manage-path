@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "scripts": {
     "prebuild": "rm -rf dist && mkdir dist",
-    "build": "pushd src && babel index.js get-path-var.js -d ../dist && popd",
+    "build": "cd src && babel index.js get-path-var.js -d ../dist && cd ..",
     "eslint": "eslint src/index.js src/get-path-var.js -c other/src.eslintrc && eslint src/*.test.js",
     "test": "istanbul cover -x *.test.js _mocha -- -R spec src/*.test.js --compilers js:babel/register",
     "start": "mocha src/*.test.js -w . --compilers js:babel/register",
