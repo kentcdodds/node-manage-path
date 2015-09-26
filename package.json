@@ -1,14 +1,18 @@
 {
   "name": "add-to-path",
   "description": "Cross-platform method to add a directory to your $PATH",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "scripts": {
+    "prebuild": "rm -rf dist && mkdir dist",
+    "build": "pushd src && babel index.js get-path-var.js -d ../dist && popd",
     "eslint": "eslint src/index.js src/get-path-var.js -c other/src.eslintrc && eslint src/*.test.js",
     "test": "istanbul cover -x *.test.js _mocha -- -R spec src/*.test.js --compilers js:babel/register",
     "start": "mocha src/*.test.js -w . --compilers js:babel/register",
     "check-coverage": "istanbul check-coverage --statements 100 --branches 100 --functions 100 --lines 100",
     "report-coverage": "echo 'Reporting coverage stats' && cat ./coverage/lcov.info | codecov",
     "commit": "git-cz",
+    "prepublish": "npm run build",
+    "postpublish": "publish-latest",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "repository": {
@@ -38,6 +42,7 @@
     "ghooks": "0.3.2",
     "istanbul": "0.3.19",
     "mocha": "2.3.2",
+    "publish-latest": "1.0.2",
     "semantic-release": "^4.3.4",
     "validate-commit-msg": "1.0.0"
   },
