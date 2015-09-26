@@ -41,3 +41,5 @@ Defaults to `undefined`, but when set to `true` will add the directory you pass 
 
 LICENSE -> MIT
 
+Much of the original code for this came from [npm/npm](https://github.com/npm/npm)
+
