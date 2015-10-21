@@ -1,26 +1,43 @@
 const getPathVar = require('./get-path-var')
-const env = process.env
-module.exports = addToPath
+const getSeparator = require('./get-separator')
 
-function addToPath(pathToAdd, options) {
-  let platform, PATH, originalPath, pathArray
-  if (!isNonEmptyString(pathToAdd)) {
-    throw new Error('path-to-add error: Must pass a non-empty string. You passed: ' + pathToAdd)
+module.exports = managePath
+
+function managePath(env = {}, {platform = process.platform} = {platform: process.platform}) {
+  const pathVar = getPathVar(env, platform)
+  const separator = getSeparator(platform)
+  const originalPath = env[pathVar]
+  return {push, shift, get, restore}
+
+  function push(...paths) {
+    return change(true, paths)
   }
-  options = options || {}
-  platform = options.platform || process.platform
-  PATH = getPathVar(env, platform)
 
-  originalPath = env[PATH]
-  pathArray = getPathArray(pathToAdd)
-
-  addExistingPath(pathArray, env[PATH], options.append)
-
-  env[PATH] = pathArray.join(platform === 'win32' ? ';' : ':')
-
-  return function restorePath() {
-    env[PATH] = originalPath
+  function shift(...paths) {
+    return change(false, paths)
   }
+
+  function get() {
+    return env[pathVar]
+  }
+
+  function restore() {
+    env[pathVar] = originalPath
+    return get()
+  }
+
+  function change(append, paths) {
+    if (!append) {
+      paths = paths.reverse()
+    }
+    paths.forEach(path => {
+      const pathArray = getPathArray(path)
+      addExistingPath(pathArray, env[pathVar], append)
+      env[pathVar] = pathArray.join(separator)
+    })
+    return get()
+  }
+
 }
 
 function getPathArray(pathToAdd) {
@@ -40,12 +57,5 @@ function addExistingPath(array, path, appendMode) {
   } else {
     array.push(path)
   }
-}
-
-function isNonEmptyString(arg, noArrays) {
-  if (!noArrays && Array.isArray(arg)) {
-    return arg.every(a => isNonEmptyString(a, true))
-  }
-  return typeof arg === 'string' && arg.length > 0
 }
 

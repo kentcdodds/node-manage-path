@@ -1,13 +1,112 @@
 import chai from 'chai'
-import addToPath from './index'
+import managePath from './index'
 import getPathVar from './get-path-var'
+import getSeparator from './get-separator'
 
 const expect = chai.expect
-const PATH = getPathVar()
-const env = process.env
 
 chai.use(require('chai-string'))
 
+describe(`manage-path`, () => {
+  const path1 = '/usr/other/bin'
+  const path2 = '/usr/other2/bin'
+
+  describe(`darwin`, () => {
+    common('darwin')
+  })
+
+  describe(`win32`, () => {
+    common('win32')
+  })
+
+  describe(`outliers`, () => {
+    it(`should function without a given env or platform`, () => {
+      const alter = managePath()
+      expect(alter.push(path1)).to.equal(path1)
+    })
+
+    it(`should default to process.platform for the platform`, () => {
+      const env = {}
+      const alter = managePath({env}, {})
+      expect(alter.push(path2)).to.equal(path2)
+    })
+
+  })
+
+
+  function common(platform) {
+    const pathVar = getPathVar({}, platform)
+    const separator = getSeparator(platform)
+    const originalPath = `/usr/bin${separator}~/.bin`
+
+    let alter, env
+    beforeEach(() => {
+      env = {USER: 'lukeskywalker', [pathVar]: originalPath}
+      alter = managePath(env, {platform})
+    })
+
+    describe(`shift`, () => {
+      addOpTests('shift')
+    })
+
+    describe(`push`, () => {
+      addOpTests('push')
+    })
+
+    describe(`get`, () => {
+      it(`should return the current state of env's PATH variable`, () => {
+        const result = alter.get()
+        expect(result).to.equal(env[pathVar])
+      })
+    })
+
+    describe(`restore`, () => {
+      it(`should restore the original state of env's PATH variable`, () => {
+        const pushedValue = alter.push(path1)
+        const result = alter.restore()
+        const get = alter.get()
+        expect(pushedValue).to.not.equal(result)
+        expect(result).to.equal(get)
+        expect(result).to.equal(originalPath)
+      })
+    })
+
+    function addOpTests(op) {
+      const reverse = op === 'push'
+      it(`should prepend a single path`, () => {
+        const result = alter[op](path1)
+        let expected = [path1, originalPath]
+        if (reverse) {
+          expected = expected.reverse()
+        }
+        expect(result).to.equal(expected.join(separator))
+      })
+
+      it(`should prepend multiple paths with rest params`, () => {
+        const result = alter[op](path1, path2)
+        let expected = [path1, path2, originalPath]
+        if (reverse) {
+          expected = [originalPath, path1, path2]
+        }
+        expect(result).to.equal(expected.join(separator))
+      })
+
+      it(`should prepend multiple paths as an array`, () => {
+        const result = alter[op]([path1, path2])
+        let expected = [path1, path2, originalPath]
+        if (reverse) {
+          expected = [originalPath, path1, path2]
+        }
+        expect(result).to.equal(expected.join(separator))
+      })
+    }
+
+  }
+
+})
+
+
+/*
 describe('add-to-path', () => {
   let originalPath
   const pathToAdd = '/foo/bar/.bin'
@@ -81,3 +180,4 @@ describe('add-to-path', () => {
   })
 })
 
+*/
