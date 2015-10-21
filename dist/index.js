@@ -16,7 +16,7 @@ function managePath() {
   var pathVar = getPathVar(env, platform);
   var separator = getSeparator(platform);
   var originalPath = env[pathVar];
-  return { push: push, shift: shift, get: get, restore: restore };
+  return { push: push, unshift: unshift, get: get, restore: restore };
 
   function push() {
     for (var _len = arguments.length, paths = Array(_len), _key = 0; _key < _len; _key++) {
@@ -26,7 +26,7 @@ function managePath() {
     return change(true, paths);
   }
 
-  function shift() {
+  function unshift() {
     for (var _len2 = arguments.length, paths = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
       paths[_key2] = arguments[_key2];
     }

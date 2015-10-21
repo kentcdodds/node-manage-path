@@ -7,13 +7,13 @@ function managePath(env = {}, {platform = process.platform} = {platform: process
   const pathVar = getPathVar(env, platform)
   const separator = getSeparator(platform)
   const originalPath = env[pathVar]
-  return {push, shift, get, restore}
+  return {push, unshift, get, restore}
 
   function push(...paths) {
     return change(true, paths)
   }
 
-  function shift(...paths) {
+  function unshift(...paths) {
     return change(false, paths)
   }
 

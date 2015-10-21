@@ -45,8 +45,8 @@ describe(`manage-path`, () => {
       alter = managePath(env, {platform})
     })
 
-    describe(`shift`, () => {
-      addOpTests('shift')
+    describe(`unshift`, () => {
+      addOpTests('unshift')
     })
 
     describe(`push`, () => {

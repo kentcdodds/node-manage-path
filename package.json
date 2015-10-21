@@ -56,5 +56,5 @@
   "czConfig": {
     "path": "node_modules/cz-conventional-changelog/"
   },
-  "version": "1.0.1"
+  "version": "2.0.0"
 }
