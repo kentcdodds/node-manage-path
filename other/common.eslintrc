@@ -1,0 +1,7 @@
+{
+  // custom rules shared between src and test will go here
+  "rules": {},
+  "ecmaFeatures": {
+    "experimentalObjectRestSpread": true
+  }
+}

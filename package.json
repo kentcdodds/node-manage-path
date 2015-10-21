@@ -4,8 +4,10 @@
   "main": "dist/index.js",
   "scripts": {
     "prebuild": "rm -rf dist && mkdir dist",
-    "build": "cd src && babel index.js get-path-var.js -d ../dist && cd ..",
-    "eslint": "eslint src/index.js src/get-path-var.js -c other/src.eslintrc && eslint src/*.test.js",
+    "build": "cd src && babel --ignore **/*.test.js -d ../dist . && cd ..",
+    "eslint:test": "eslint -c other/test.eslintrc --ignore-pattern '**/*.+(test|mock).js' src/",
+    "eslint:src": "eslint -c other/src.eslintrc --ignore-pattern '!**/*.+(test|mock).js' src/",
+    "eslint": "npm run eslint:test -s && npm run eslint:src -s",
     "test": "istanbul cover -x *.test.js _mocha -- -R spec src/*.test.js --compilers js:babel/register",
     "start": "mocha src/*.test.js -w . --compilers js:babel/register",
     "check-coverage": "istanbul check-coverage --statements 100 --branches 100 --functions 100 --lines 100",
