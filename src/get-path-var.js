@@ -1,13 +1,13 @@
 module.exports = getPathVar
+const PATH_REGEX = /^PATH$/i
 
-function getPathVar(platform) {
+function getPathVar(env, platform) {
   let PATH = 'PATH'
-  platform = platform || process.platform
 
   if (platform === 'win32') {
     PATH = 'Path'
-    Object.keys(process.env).some(e => {
-      const matches = e.match(/^PATH$/i)
+    Object.keys(env).some(e => {
+      const matches = PATH_REGEX.test(e)
       if (matches) {
         PATH = e
       }

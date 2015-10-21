@@ -1,20 +1,32 @@
 const getPathVar = require('./get-path-var')
-const env = process.env
 module.exports = addToPath
 
-function addToPath(pathToAdd, options) {
-  let platform, PATH, originalPath, pathArray
-  if (!isNonEmptyString(pathToAdd)) {
-    throw new Error('path-to-add error: Must pass a non-empty string. You passed: ' + pathToAdd)
+function addToPath(
+  env,
+  pathToAdd,
+  {
+    append = false,
+    platform = process.platform,
   }
-  options = options || {}
-  platform = options.platform || process.platform
-  PATH = getPathVar(platform)
+    =
+    {
+      append: false,
+      platform: process.platform,
+    }
+) {
+  let PATH, originalPath, pathArray
+  if (typeof env !== 'object') {
+    throw new Error('add-to-path error: must provide an env to manipulate')
+  }
+  if (!isNonEmptyString(pathToAdd)) {
+    throw new Error('add-to-path error: Must pass a non-empty string. You passed: ' + pathToAdd)
+  }
+  PATH = getPathVar(env, platform)
 
   originalPath = env[PATH]
   pathArray = getPathArray(pathToAdd)
 
-  addExistingPath(pathArray, env[PATH], options.append)
+  addExistingPath(pathArray, env[PATH], append)
 
   env[PATH] = pathArray.join(platform === 'win32' ? ';' : ':')
 
