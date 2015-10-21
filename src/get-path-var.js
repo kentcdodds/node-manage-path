@@ -1,18 +1,18 @@
-module.exports = getPathVar;
+module.exports = getPathVar
 
 function getPathVar(platform) {
-  var PATH = 'PATH';
-  platform = platform || process.platform;
+  let PATH = 'PATH'
+  platform = platform || process.platform
 
   if (platform === 'win32') {
-    PATH = 'Path';
+    PATH = 'Path'
     Object.keys(process.env).some(e => {
-      var matches = e.match(/^PATH$/i);
+      const matches = e.match(/^PATH$/i)
       if (matches) {
-        PATH = e;
+        PATH = e
       }
-      return matches;
-    });
+      return matches
+    })
   }
-  return PATH;
+  return PATH
 }
