@@ -1,51 +1,61 @@
-var getPathVar = require('./get-path-var');
-var env = process.env;
-module.exports = addToPath;
+const getPathVar = require('./get-path-var')
+const getSeparator = require('./get-separator')
 
-function addToPath(pathToAdd, options) {
-  var platform, PATH, originalPath, pathArray;
-  if (!isNonEmptyString(pathToAdd)) {
-    throw new Error('path-to-add error: Must pass a non-empty string. You passed: ' + pathToAdd);
+module.exports = managePath
+
+function managePath(env = {}, {platform = process.platform} = {platform: process.platform}) {
+  const pathVar = getPathVar(env, platform)
+  const separator = getSeparator(platform)
+  const originalPath = env[pathVar]
+  return {push, shift, get, restore}
+
+  function push(...paths) {
+    return change(true, paths)
   }
-  options = options || {};
-  platform = options.platform || process.platform;
-  PATH = getPathVar(platform);
 
-  originalPath = env[PATH];
-  pathArray = getPathArray(pathToAdd);
+  function shift(...paths) {
+    return change(false, paths)
+  }
 
-  addExistingPath(pathArray, env[PATH], options.append);
+  function get() {
+    return env[pathVar]
+  }
 
-  env[PATH] = pathArray.join(platform === 'win32' ? ';' : ':');
+  function restore() {
+    env[pathVar] = originalPath
+    return get()
+  }
 
-  return function restorePath() {
-    env[PATH] = originalPath;
-  };
+  function change(append, paths) {
+    if (!append) {
+      paths = paths.reverse()
+    }
+    paths.forEach(path => {
+      const pathArray = getPathArray(path)
+      addExistingPath(pathArray, env[pathVar], append)
+      env[pathVar] = pathArray.join(separator)
+    })
+    return get()
+  }
+
 }
 
 function getPathArray(pathToAdd) {
   if (Array.isArray(pathToAdd)) {
-    return pathToAdd;
+    return pathToAdd
   } else {
-    return [pathToAdd];
+    return [pathToAdd]
   }
 }
 
 function addExistingPath(array, path, appendMode) {
   if (!path) {
-    return;
+    return
   }
   if (appendMode) {
-    array.unshift(path);
+    array.unshift(path)
   } else {
-    array.push(path);
+    array.push(path)
   }
-}
-
-function isNonEmptyString(arg, noArrays) {
-  if (!noArrays && Array.isArray(arg)) {
-    return arg.every(a => isNonEmptyString(a, true));
-  }
-  return typeof arg === 'string' && arg.length > 0;
 }
 

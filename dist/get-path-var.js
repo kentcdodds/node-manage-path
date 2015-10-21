@@ -1,15 +1,15 @@
 'use strict';
 
 module.exports = getPathVar;
+var PATH_REGEX = /^PATH$/i;
 
-function getPathVar(platform) {
+function getPathVar(env, platform) {
   var PATH = 'PATH';
-  platform = platform || process.platform;
 
   if (platform === 'win32') {
     PATH = 'Path';
-    Object.keys(process.env).some(function (e) {
-      var matches = e.match(/^PATH$/i);
+    Object.keys(env).some(function (e) {
+      var matches = PATH_REGEX.test(e);
       if (matches) {
         PATH = e;
       }

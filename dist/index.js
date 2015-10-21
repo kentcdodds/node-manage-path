@@ -1,28 +1,59 @@
 'use strict';
 
 var getPathVar = require('./get-path-var');
-var env = process.env;
-module.exports = addToPath;
+var getSeparator = require('./get-separator');
 
-function addToPath(pathToAdd, options) {
-  var platform, PATH, originalPath, pathArray;
-  if (!isNonEmptyString(pathToAdd)) {
-    throw new Error('path-to-add error: Must pass a non-empty string. You passed: ' + pathToAdd);
+module.exports = managePath;
+
+function managePath() {
+  var env = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+  var _ref = arguments.length <= 1 || arguments[1] === undefined ? { platform: process.platform } : arguments[1];
+
+  var _ref$platform = _ref.platform;
+  var platform = _ref$platform === undefined ? process.platform : _ref$platform;
+
+  var pathVar = getPathVar(env, platform);
+  var separator = getSeparator(platform);
+  var originalPath = env[pathVar];
+  return { push: push, shift: shift, get: get, restore: restore };
+
+  function push() {
+    for (var _len = arguments.length, paths = Array(_len), _key = 0; _key < _len; _key++) {
+      paths[_key] = arguments[_key];
+    }
+
+    return change(true, paths);
   }
-  options = options || {};
-  platform = options.platform || process.platform;
-  PATH = getPathVar(platform);
 
-  originalPath = env[PATH];
-  pathArray = getPathArray(pathToAdd);
+  function shift() {
+    for (var _len2 = arguments.length, paths = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      paths[_key2] = arguments[_key2];
+    }
 
-  addExistingPath(pathArray, env[PATH], options.append);
+    return change(false, paths);
+  }
 
-  env[PATH] = pathArray.join(platform === 'win32' ? ';' : ':');
+  function get() {
+    return env[pathVar];
+  }
 
-  return function restorePath() {
-    env[PATH] = originalPath;
-  };
+  function restore() {
+    env[pathVar] = originalPath;
+    return get();
+  }
+
+  function change(append, paths) {
+    if (!append) {
+      paths = paths.reverse();
+    }
+    paths.forEach(function (path) {
+      var pathArray = getPathArray(path);
+      addExistingPath(pathArray, env[pathVar], append);
+      env[pathVar] = pathArray.join(separator);
+    });
+    return get();
+  }
 }
 
 function getPathArray(pathToAdd) {
@@ -42,13 +73,4 @@ function addExistingPath(array, path, appendMode) {
   } else {
     array.push(path);
   }
-}
-
-function isNonEmptyString(arg, noArrays) {
-  if (!noArrays && Array.isArray(arg)) {
-    return arg.every(function (a) {
-      return isNonEmptyString(a, true);
-    });
-  }
-  return typeof arg === 'string' && arg.length > 0;
 }
