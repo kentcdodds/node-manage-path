@@ -9,7 +9,7 @@ function addToPath(pathToAdd, options) {
   }
   options = options || {}
   platform = options.platform || process.platform
-  PATH = getPathVar(platform)
+  PATH = getPathVar(env, platform)
 
   originalPath = env[PATH]
   pathArray = getPathArray(pathToAdd)
