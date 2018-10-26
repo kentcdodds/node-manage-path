@@ -14,7 +14,7 @@ This micro-lib allows you to alter the `$PATH` in a cross-platform way.
 var path = require('path')
 var managePath = require('manage-path')
 var alterPath = managePath(process.env)
-alterPath.shift(path.join(process.cwd(), 'node_modules', '.bin') // add one path to the beginning
+alterPath.unshift(path.join(process.cwd(), 'node_modules', '.bin') // add one path to the beginning
 // process.env.PATH now starts with the `.bin` in your `node_modules` directory :-)
 // unless you happen to be running on windows, in which case it *might* be process.env.Path :-)
 // but you don't have to think about that...
